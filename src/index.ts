@@ -1,19 +1,37 @@
-import { Application, Sprite } from 'pixi.js'
+import { Application, Color } from 'pixi.js';
+import { Playground } from './Playground';
+
+let screenWidth = window.innerWidth;
+let screenHeight = window.innerHeight;
 
 const app = new Application({
 	view: document.getElementById("pixi-canvas") as HTMLCanvasElement,
 	resolution: window.devicePixelRatio || 1,
 	autoDensity: true,
-	backgroundColor: 0x6495ed,
-	width: 640,
-	height: 480
+	antialias: true,
+	backgroundColor: new Color("rgb(74, 161, 118, 1)"),
+	width: screenWidth,
+	height: screenHeight,
 });
 
-const clampy: Sprite = Sprite.from("clampy.png");
+let playground = new Playground();
+app.stage.addChild(playground);
 
-clampy.anchor.set(0.5);
+const resizeScreen = () => {
+	screenWidth = window.innerWidth;
+	screenHeight = window.innerHeight;
+	let ratio = Math.min(screenWidth / 3, screenHeight / 2) * 0.8;
+	playground.width = ratio * 3;
+	playground.height = ratio * 2;
+	playground.x = (screenWidth - playground.width) / 2;
+	playground.y = (screenHeight - playground.height) / 2;
+}
 
-clampy.x = app.screen.width / 2;
-clampy.y = app.screen.height / 2;
+window.addEventListener("resize", () => {
+	resizeScreen();
+});
 
-app.stage.addChild(clampy);
+app.ticker.add((delta: number) => {
+	playground.onTimer(delta);
+})
+resizeScreen();
